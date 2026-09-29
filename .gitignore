@@ -1,0 +1,22 @@
+# ---- Gradle / 构建产物 ----
+.gradle/
+build/
+.kotlin/
+captures/
+.cxx/
+.externalNativeBuild/
+*.iml
+.idea/
+
+# ---- 本机路径（含 SDK 绝对路径），绝不入库 ----
+local.properties
+
+# ---- SDK / 密钥 ----
+*.jks
+*.keystore
+keystore.properties
+
+# ---- 真机截图：里面有笔记内容和手机桌面，不随仓库公开 ----
+docs/shot-*.png
+docs/diag-*.png
+docs/skeleton-check.png

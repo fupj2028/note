@@ -1,0 +1,11 @@
+<!-- 分类管理入口用的标签图标。core 图标集里没有标签/分类形状，只能自己画一个。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M8,5 H19 A2,2 0 0 1 21,7 V17 A2,2 0 0 1 19,19 H8 L3,12 Z M7,10.7 A1.3,1.3 0 1 0 7,13.3 A1.3,1.3 0 1 0 7,10.7 Z" />
+</vector>

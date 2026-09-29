@@ -1,0 +1,17 @@
+<!-- Android 13+ 主题图标用的单色层。系统只取形状，颜色由系统上，所以这里用描边画出线稿形状。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M42,28 L62,28 L74,40 L74,76 A4,4 0 0 1 70,80 L42,80 A4,4 0 0 1 38,76 L38,32 A4,4 0 0 1 42,28 Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M45,52 L67,52 M45,62 L67,62 M45,72 L60,72"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5" />
+</vector>

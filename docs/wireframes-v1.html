@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>备忘录 App · 第一版线稿</title>
+<style>
+  :root{
+    --surface:#FFFFFF;
+    --surface-dim:#F2F2F2;
+    --surface-container:#EAEAEA;
+    --surface-container-high:#E0E0E0;
+    --on-surface:#1B1B1B;
+    --on-surface-variant:#5D5D5D;
+    --outline:#C6C6C6;
+    --outline-variant:#DEDEDE;
+    --primary:#3F3F3F;
+    --on-primary:#FFFFFF;
+    --primary-container:#D6D6D6;
+    --scrim:rgba(0,0,0,0.32);
+    --page:#F7F7F7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:var(--page); color:var(--on-surface); padding:28px 24px 40px;
+  }
+  h1{font-size:20px;font-weight:600;margin-bottom:6px;}
+  .sub{font-size:13px;color:var(--on-surface-variant);margin-bottom:22px;}
+  .grid{display:grid;grid-template-columns:repeat(4,360px);gap:34px 30px;}
+  .cell{display:flex;flex-direction:column;gap:8px;}
+  .cap{font-size:13px;font-weight:600;color:var(--on-surface);}
+  .cap span{font-weight:400;color:var(--on-surface-variant);}
+
+  /* ---------- 手机外框 ---------- */
+  .phone{
+    width:360px;height:760px;background:var(--surface);
+    border:1px solid var(--outline);border-radius:26px;overflow:hidden;
+    display:flex;flex-direction:column;position:relative;
+  }
+  /* ---------- 状态栏 ---------- */
+  .statusbar{
+    height:26px;flex:0 0 26px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 14px;font-size:10px;color:var(--on-surface-variant);
+  }
+  .statusbar .right{display:flex;gap:4px;}
+  .statusbar .right i{display:block;width:12px;height:8px;background:var(--outline);border-radius:2px;}
+
+  /* ---------- 顶栏 ---------- */
+  .appbar{
+    height:56px;flex:0 0 56px;display:flex;align-items:center;gap:4px;
+    padding:0 8px 0 16px;background:var(--surface);
+  }
+  .appbar.tonal{background:var(--surface-dim);}
+  .appbar h2{font-size:20px;font-weight:500;flex:1;}
+  .iconbtn{
+    width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:15px;color:var(--on-surface-variant);flex:0 0 40px;
+  }
+  .iconbtn.dark{color:var(--on-surface);}
+  .back{font-size:17px;}
+
+  /* ---------- 搜索框 ---------- */
+  .searchbar{
+    height:48px;margin:4px 12px 8px;border:1px solid var(--outline);border-radius:26px;
+    display:flex;align-items:center;gap:8px;padding:0 14px;color:var(--on-surface-variant);font-size:14px;
+  }
+  .searchbar .q{flex:1;color:#9A9A9A;}
+  .searchbar .x{font-size:13px;}
+
+  /* ---------- 内容区 ---------- */
+  .body{flex:1;overflow:hidden;padding:0 0 8px;display:flex;flex-direction:column;}
+  .chips{display:flex;gap:8px;padding:0 16px 10px;overflow:hidden;}
+  .chip{
+    height:32px;padding:0 14px;border:1px solid var(--outline);border-radius:9px;
+    display:flex;align-items:center;font-size:13px;color:var(--on-surface-variant);white-space:nowrap;
+  }
+  .chip.on{background:var(--primary-container);border-color:var(--primary-container);color:var(--on-surface);font-weight:500;}
+  .chip.add{border-style:dashed;color:var(--on-surface);}
+  .sechead{font-size:12px;font-weight:600;color:var(--on-surface-variant);padding:6px 16px 6px;letter-spacing:.4px;}
+
+  .list{padding:0 12px;display:flex;flex-direction:column;}
+  .item{
+    display:flex;flex-direction:column;gap:6px;padding:11px 12px;border-radius:16px;
+    background:var(--surface);border:1px solid var(--outline-variant);
+  }
+  .item + .item{margin-top:6px;}
+  .item.pin{background:var(--surface-dim);border-color:var(--surface-container-high);}
+  .item.press{background:var(--surface-container);border-color:var(--surface-container-high);}
+  .row1{display:flex;align-items:center;gap:8px;}
+  .ntitle{font-size:15px;font-weight:600;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+  .meta{font-size:11px;color:var(--on-surface-variant);white-space:nowrap;}
+  .bar{height:7px;border-radius:4px;background:var(--surface-container-high);}
+  .b90{width:90%}.b75{width:75%}.b60{width:60%}.b45{width:45%}
+  .tags{display:flex;gap:6px;}
+  .tag{font-size:10px;padding:2px 7px;border-radius:6px;background:var(--surface-container);color:var(--on-surface-variant);}
+  .hl{background:var(--primary-container);border-radius:3px;padding:0 2px;font-weight:600;}
+
+  .fab{
+    position:absolute;right:18px;bottom:22px;width:58px;height:58px;border-radius:18px;
+    background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;font-size:24px;
+  }
+  .fabtext{
+    position:absolute;right:18px;bottom:22px;height:56px;padding:0 20px;border-radius:18px;
+    background:var(--primary);color:var(--on-primary);display:flex;align-items:center;gap:8px;font-size:15px;font-weight:500;
+  }
+  .fabtext .plus{font-size:20px;}
+
+  /* ---------- 编辑页 ---------- */
+  .editor{flex:1;display:flex;flex-direction:column;padding:0 16px;overflow:hidden;}
+  .etitle{font-size:24px;font-weight:600;color:var(--on-surface);padding:8px 0 10px;}
+  .divider{height:1px;background:var(--outline-variant);}
+  .etext{font-size:15px;line-height:24px;color:var(--on-surface);padding-top:12px;}
+  .sel{background:#CFCFCF;border-radius:3px;}
+  .floatingtool{
+    position:absolute;left:50%;transform:translateX(-50%);top:326px;height:40px;
+    background:#3A3A3A;border-radius:20px;display:flex;align-items:center;gap:20px;padding:0 20px;
+    color:#fff;font-size:13px;width:max-content;white-space:nowrap;
+  }
+  .floatingtool span{white-space:nowrap;}
+  .mag{
+    width:14px;height:14px;border:2px solid var(--on-surface);border-radius:50%;
+    position:relative;display:block;
+  }
+  .mag::after{
+    content:"";position:absolute;right:-5px;bottom:-4px;width:7px;height:2px;
+    background:var(--on-surface);transform:rotate(45deg);
+  }
+  .bottomstatus{
+    height:34px;flex:0 0 34px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px;font-size:11px;color:var(--on-surface-variant);border-top:1px solid var(--outline-variant);
+  }
+
+  /* ---------- 底部面板 ---------- */
+  .scrim{position:absolute;inset:0;background:var(--scrim);}
+  .sheet{
+    position:absolute;left:0;right:0;bottom:0;background:var(--surface);
+    border-radius:28px 28px 0 0;padding:10px 0 18px;border:1px solid var(--outline-variant);border-bottom:none;
+  }
+  .handle{width:32px;height:4px;border-radius:2px;background:var(--outline);margin:0 auto 12px;}
+  .sheet h3{font-size:16px;font-weight:600;padding:0 24px 2px;}
+  .sheet .sm{font-size:12px;color:var(--on-surface-variant);padding:0 24px 12px;}
+  .grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px 12px 8px;}
+  .act{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0;font-size:11px;color:var(--on-surface-variant);}
+  .act .ic{width:46px;height:46px;border-radius:50%;background:var(--surface-container);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--on-surface);}
+  .sdiv{height:1px;background:var(--outline-variant);margin:6px 24px;}
+  .srow{display:flex;align-items:center;gap:12px;padding:13px 24px;font-size:14px;}
+  .srow .ic{font-size:16px;color:var(--on-surface-variant);width:20px;text-align:center;}
+  .srow .lb{flex:1;}
+  .srow.danger{color:#7A3B3B;}
+
+  /* ---------- 设置页 ---------- */
+  .setgroup{padding:6px 12px 2px;}
+  .sethead{font-size:12px;font-weight:600;color:var(--on-surface-variant);padding:12px 12px 6px;letter-spacing:.4px;}
+  .setrow{display:flex;align-items:center;gap:12px;padding:14px 12px;font-size:14px;border-radius:12px;}
+  .setrow .lb{flex:1;}
+  .setrow .val{font-size:13px;color:var(--on-surface-variant);}
+  .setrow .chev{color:var(--outline);}
+  .radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--outline);}
+  .radio.on{border-color:var(--primary);background:radial-gradient(circle,var(--primary) 0 4px,transparent 4.5px);}
+
+  /* ---------- 回收站 ---------- */
+  .trashitem{
+    display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--outline-variant);border-radius:14px;
+  }
+  .trashitem + .trashitem{margin-top:6px;}
+  .del{font-size:11px;color:#8A5A5A;}
+  .restore{font-size:11px;color:var(--on-surface-variant);}
+
+  /* ---------- 空状态 ---------- */
+  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding-bottom:60px;}
+  .empty .art{width:104px;height:104px;border-radius:28px;background:var(--surface-container);border:1px dashed var(--outline);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--outline);}
+  .empty .t{font-size:16px;font-weight:600;}
+  .empty .d{font-size:13px;color:var(--on-surface-variant);text-align:center;line-height:20px;}
+
+  /* ---------- 通用按钮 ---------- */
+  .btns{display:flex;gap:10px;padding:8px 24px 4px;}
+  .btn{flex:1;height:46px;border-radius:23px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;}
+  .btn.ghost{border:1px solid var(--outline);color:var(--on-surface-variant);}
+  .btn.solid{background:var(--primary);color:var(--on-primary);}
+  .note{font-size:12px;color:var(--on-surface-variant);padding:0 24px 10px;}
+
+  .legend{
+    margin-top:30px;padding:16px 18px;border:1px solid var(--outline-variant);border-radius:14px;
+    background:var(--surface);font-size:13px;line-height:22px;color:var(--on-surface-variant);max-width:1560px;
+  }
+  .legend b{color:var(--on-surface);}
+</style>
+</head>
+<body>
+  <h1>备忘录 App · 第一版线稿</h1>
+  <p class="sub">灰度线稿，只定布局与层级；配色留到实现阶段用 Material You 动态取色。9 个页面 / 状态。</p>
+
+  <div class="grid">
+
+    <!-- ① 笔记列表 -->
+    <div class="cell">
+      <div class="cap">① 笔记列表 <span>（首页）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><h2>备忘录</h2><div class="iconbtn dark"><span class="mag"></span></div><div class="iconbtn">⋮</div></div>
+        <div class="chips">
+          <div class="chip on">全部</div><div class="chip">工作</div><div class="chip">灵感</div><div class="chip">待办</div><div class="chip add">管理</div>
+        </div>
+        <div class="body">
+          <div class="sechead">置顶</div>
+          <div class="list">
+            <div class="item pin">
+              <div class="row1"><span class="ntitle">银行卡号与开户行</span><span class="tag">置顶</span></div>
+              <div class="bar b90"></div><div class="bar b45"></div>
+            </div>
+            <div class="item pin">
+              <div class="row1"><span class="ntitle">常用快递地址</span><span class="tag">置顶</span></div>
+              <div class="bar b75"></div>
+            </div>
+          </div>
+          <div class="sechead">全部 · 12 条</div>
+          <div class="list">
+            <div class="item">
+              <div class="row1"><span class="ntitle">会议纪要 9/28</span><span class="meta">10:20</span></div>
+              <div class="bar b90"></div><div class="bar b60"></div>
+              <div class="tags"><span class="tag">工作</span></div>
+            </div>
+            <div class="item">
+              <div class="row1"><span class="ntitle">想买的东西</span><span class="meta">昨天</span></div>
+              <div class="bar b75"></div>
+              <div class="tags"><span class="tag">待办</span></div>
+            </div>
+            <div class="item">
+              <div class="row1"><span class="ntitle">小区门禁密码</span><span class="meta">9/26</span></div>
+              <div class="bar b45"></div>
+            </div>
+            <div class="item">
+              <div class="row1"><span class="ntitle">一段随手记</span><span class="meta">9/25</span></div>
+              <div class="bar b90"></div><div class="bar b45"></div>
+            </div>
+          </div>
+        </div>
+        <div class="fab">+</div>
+      </div>
+    </div>
+
+    <!-- ② 搜索态 -->
+    <div class="cell">
+      <div class="cap">② 搜索态 <span>（列表页展开）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar tonal"><div class="iconbtn back">←</div><h2 style="font-size:17px;font-weight:400;color:#8A8A8A;">搜索标题或正文</h2><div class="iconbtn dark">✕</div></div>
+        <div class="body">
+          <div class="sechead" style="padding-top:8px;">找到 7 条 · 按修改时间</div>
+          <div class="list">
+            <div class="item">
+              <div class="row1"><span class="ntitle">小区<span class="hl">门禁</span>密码</span><span class="meta">9/26</span></div>
+              <div class="bar b45"></div>
+            </div>
+            <div class="item">
+              <div class="row1"><span class="ntitle">家里 wifi 密码</span><span class="meta">9/20</span></div>
+              <div class="bar b75"></div>
+            </div>
+            <div class="item">
+              <div class="row1"><span class="ntitle">公司 <span class="hl">门禁</span>卡办理</span><span class="meta">9/12</span></div>
+              <div class="bar b60"></div>
+            </div>
+            <div class="item">
+              <div class="row1"><span class="ntitle">各种账号备忘</span><span class="meta">8/30</span></div>
+              <div class="bar b90"></div><div class="bar b45"></div>
+            </div>
+          </div>
+          <div class="note" style="padding-top:14px;">↑ 命中的词直接高亮，标题和正文都搜</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 编辑页 -->
+    <div class="cell">
+      <div class="cap">③ 编辑页 <span>（新建 / 打开同页）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><div class="iconbtn back">←</div><h2 style="font-size:13px;font-weight:400;color:#8A8A8A;text-align:center;">已保存 · 刚刚</h2><div class="iconbtn dark">⋮</div></div>
+        <div class="editor">
+          <div class="etitle">小区门禁密码</div>
+          <div class="divider"></div>
+          <div class="etext">
+            1 号楼：<span class="sel">8823#</span><br>
+            2 号楼：8824#<br>
+            地下车库：<br>
+            8825#（晚上 11 点后启用）<br><br>
+            物业电话 021-xxxx-6688
+          </div>
+        </div>
+        <div class="floatingtool"><span>全选</span><span>复制</span><span>粘贴</span><span>更多</span></div>
+        <div class="bottomstatus"><span>12 行 · 68 字</span><span>9/26 14:02 修改</span></div>
+      </div>
+    </div>
+
+    <!-- ④ 长按操作面板 -->
+    <div class="cell">
+      <div class="cap">④ 长按操作面板 <span>（列表项）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><h2>备忘录</h2><div class="iconbtn dark"><span class="mag"></span></div></div>
+        <div class="body">
+          <div class="list" style="padding-top:6px;">
+            <div class="item press">
+              <div class="row1"><span class="ntitle">小区门禁密码</span><span class="meta">9/26</span></div>
+              <div class="bar b45"></div>
+            </div>
+            <div class="item">
+              <div class="row1"><span class="ntitle">一段随手记</span><span class="meta">9/25</span></div>
+              <div class="bar b90"></div>
+            </div>
+          </div>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <h3>小区门禁密码</h3>
+          <div class="sm">9/26 14:02 · 工作</div>
+          <div class="grid2">
+            <div class="act"><div class="ic">↑</div>置顶</div>
+            <div class="act"><div class="ic">⧉</div>复制全文</div>
+            <div class="act"><div class="ic">↓</div>导出</div>
+            <div class="act"><div class="ic">#</div>分类</div>
+          </div>
+          <div class="sdiv"></div>
+          <div class="srow danger"><span class="lb" style="padding-left:4px;">删除</span><span>移入回收站，保留 30 天</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑤ 回收站 -->
+    <div class="cell">
+      <div class="cap">⑤ 回收站</div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><div class="iconbtn back">←</div><h2>回收站</h2><div class="iconbtn" style="flex:0 0 auto;width:auto;padding:0 14px;font-size:13px;">清空</div></div>
+        <div class="body">
+          <div class="sechead" style="padding-top:8px;">删除的笔记保留 30 天，之后自动清理</div>
+          <div class="list">
+            <div class="trashitem">
+              <div style="flex:1;">
+                <div class="ntitle">旧的门禁密码</div>
+                <div class="meta" style="margin-top:4px;">9/24 删除 · 还有 28 天</div>
+              </div>
+              <span class="restore">恢复</span>
+              <span class="del">彻底删</span>
+            </div>
+            <div class="trashitem">
+              <div style="flex:1;">
+                <div class="ntitle">购物清单（已过期）</div>
+                <div class="meta" style="margin-top:4px;">9/22 删除 · 还有 26 天</div>
+              </div>
+              <span class="restore">恢复</span>
+              <span class="del">彻底删</span>
+            </div>
+            <div class="trashitem">
+              <div style="flex:1;">
+                <div class="ntitle">随手记</div>
+                <div class="meta" style="margin-top:4px;">9/20 删除 · 还有 24 天</div>
+              </div>
+              <span class="restore">恢复</span>
+              <span class="del">彻底删</span>
+            </div>
+          </div>
+          <div class="note" style="padding-top:16px;">轻点某一项＝恢复；「彻底删」需要再确认一次</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ 设置 -->
+    <div class="cell">
+      <div class="cap">⑥ 设置</div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><div class="iconbtn back">←</div><h2>设置</h2></div>
+        <div class="body">
+          <div class="setgroup">
+            <div class="sethead">外观</div>
+            <div class="setrow"><span class="lb">主题</span><span class="val">跟随系统</span><span class="chev">›</span></div>
+            <div class="setrow"><span class="lb">正文字号</span><span class="val">标准</span><span class="chev">›</span></div>
+            <div class="sethead">数据</div>
+            <div class="setrow"><span class="lb">导出全部笔记</span><span class="val">12 条</span><span class="chev">›</span></div>
+            <div class="setrow"><span class="lb">回收站</span><span class="val">3 条</span><span class="chev">›</span></div>
+            <div class="sethead">分类</div>
+            <div class="setrow"><span class="lb">分类管理</span><span class="val">4 个 · 1 个隐藏</span><span class="chev">›</span></div>
+            <div class="sethead">关于</div>
+            <div class="setrow"><span class="lb">版本</span><span class="val">0.1.0</span></div>
+          </div>
+          <div class="note" style="padding-top:20px;">数据只存在这台手机上，导出是你唯一把笔记带走的方式。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑦ 导出面板 -->
+    <div class="cell">
+      <div class="cap">⑦ 导出面板</div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><div class="iconbtn back">←</div><h2>设置</h2></div>
+        <div class="body"></div>
+        <div class="scrim"></div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <h3>导出笔记</h3>
+          <div class="sm">导出后是个文件，你能搬到电脑或网盘</div>
+          <div class="sethead" style="padding-top:6px;">范围</div>
+          <div class="setrow"><span class="radio on"></span><span class="lb">全部笔记</span><span class="val">12 条</span></div>
+          <div class="setrow"><span class="radio"></span><span class="lb">只导出当前这条</span></div>
+          <div class="sethead">格式</div>
+          <div class="setrow"><span class="radio on"></span><span class="lb">Markdown</span><span class="val">.md</span></div>
+          <div class="setrow"><span class="radio"></span><span class="lb">纯文本</span><span class="val">.txt</span></div>
+          <div class="divider" style="margin:8px 24px;"></div>
+          <div class="btns"><div class="btn ghost">取消</div><div class="btn solid">选择保存位置</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑧ 空状态 -->
+    <div class="cell">
+      <div class="cap">⑧ 空状态 <span>（一条都没有时）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><h2>备忘录</h2></div>
+        <div class="empty">
+          <div class="art">✎</div>
+          <div class="t">还没有笔记</div>
+          <div class="d">点右下角的按钮<br>想到什么就先写下来</div>
+        </div>
+        <div class="fabtext"><span class="plus">+</span>写第一条</div>
+      </div>
+    </div>
+
+    <!-- ⑨ 分类管理 -->
+    <div class="cell">
+      <div class="cap">⑨ 分类管理 <span>（本次新增）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><div class="iconbtn back">←</div><h2>分类管理</h2></div>
+        <div class="body">
+          <div class="sechead" style="padding-top:8px;">隐藏的分类不出现在筛选栏，里面的笔记不受影响</div>
+          <div class="list">
+            <div class="trashitem">
+              <div style="flex:1;">
+                <div class="ntitle">工作</div>
+                <div class="meta" style="margin-top:4px;">5 条笔记</div>
+              </div>
+              <span class="restore">显示中</span>
+              <span class="del">重命名</span>
+              <span class="del">删除</span>
+            </div>
+            <div class="trashitem">
+              <div style="flex:1;">
+                <div class="ntitle">灵感</div>
+                <div class="meta" style="margin-top:4px;">3 条笔记</div>
+              </div>
+              <span class="restore">显示中</span>
+              <span class="del">重命名</span>
+              <span class="del">删除</span>
+            </div>
+            <div class="trashitem">
+              <div style="flex:1;">
+                <div class="ntitle">待办</div>
+                <div class="meta" style="margin-top:4px;">2 条笔记</div>
+              </div>
+              <span class="restore">显示中</span>
+              <span class="del">重命名</span>
+              <span class="del">删除</span>
+            </div>
+            <div class="trashitem" style="background:var(--surface-dim);">
+              <div style="flex:1;">
+                <div class="ntitle">私密</div>
+                <div class="meta" style="margin-top:4px;">2 条笔记 · 已隐藏</div>
+              </div>
+              <span class="restore">选它显示</span>
+              <span class="del">重命名</span>
+              <span class="del">删除</span>
+            </div>
+          </div>
+          <div class="note" style="padding-top:16px;">
+            删掉一个分类，里面的笔记不会被删，只会变成「未分类」。<br>
+            隐藏只是让它从 ① 的筛选栏里收起来，随时能再放出来。
+          </div>
+        </div>
+        <div class="fabtext"><span class="plus">+</span>新建分类</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="legend">
+    <b>看线稿时请重点确认这几件事：</b><br>
+    1. <b>列表项要显示什么</b>：标题 + 正文前两行 + 时间 + 标签，置顶的单独分组放最上面 —— 够不够？还想加什么？<br>
+    2. <b>编辑页 = 阅读页</b>：点一条笔记直接进编辑态，改完自动保存，没有单独的"阅读模式"。这样最省事，你接受吗？<br>
+    3. <b>复制粘贴入口放哪</b>：正文里长按走系统选择（③ 里的浮动条），整条复制放在长按面板（④ 的「复制全文」）。<br>
+    4. <b>分类怎么用</b>：顶部一排 chip 做筛选，加 / 删 / 隐藏都在 ⑨ 分类管理页里改，① 那排最后一格「管理」是入口。第一版不做多级文件夹，够吗？<br>
+    5. <b>回收站</b>：保留 30 天，可恢复、可彻底删（⑤）。<br>
+    6. <b>导出</b>：范围选"全部 / 当前这条"，格式选 Markdown 或纯文本（⑦）。<br>
+    7. 分类管理页已补上（⑨）。"首次启动引导"没做，需要吗？
+  </div>
+</body>
+</html>

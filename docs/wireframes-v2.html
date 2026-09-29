@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>备忘录 App · 摘录部分线稿</title>
+<style>
+  :root{
+    --surface:#FFFFFF;
+    --surface-dim:#F2F2F2;
+    --surface-container:#EAEAEA;
+    --surface-container-high:#E0E0E0;
+    --on-surface:#1B1B1B;
+    --on-surface-variant:#5D5D5D;
+    --outline:#C6C6C6;
+    --outline-variant:#DEDEDE;
+    --primary:#3F3F3F;
+    --on-primary:#FFFFFF;
+    --primary-container:#D6D6D6;
+    --page:#F7F7F7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:var(--page);color:var(--on-surface);padding:28px 24px 40px;
+  }
+  h1{font-size:20px;font-weight:600;margin-bottom:6px;}
+  .sub{font-size:13px;color:var(--on-surface-variant);margin-bottom:22px;}
+  .grid{display:grid;grid-template-columns:repeat(4,360px);gap:34px 30px;}
+  .cell{display:flex;flex-direction:column;gap:8px;}
+  .cap{font-size:13px;font-weight:600;}
+  .cap span{font-weight:400;color:var(--on-surface-variant);}
+
+  .phone{
+    width:360px;height:760px;background:var(--surface);
+    border:1px solid var(--outline);border-radius:26px;overflow:hidden;
+    display:flex;flex-direction:column;position:relative;
+  }
+  .statusbar{
+    height:26px;flex:0 0 26px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 14px;font-size:10px;color:var(--on-surface-variant);
+  }
+  .statusbar .right{display:flex;gap:4px;}
+  .statusbar .right i{display:block;width:12px;height:8px;background:var(--outline);border-radius:2px;}
+
+  .appbar{height:56px;flex:0 0 56px;display:flex;align-items:center;gap:4px;padding:0 8px 0 16px;}
+  .appbar.tonal{background:var(--surface-dim);}
+  .appbar h2{font-size:20px;font-weight:500;flex:1;}
+  .iconbtn{
+    width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:15px;color:var(--on-surface-variant);flex:0 0 40px;
+  }
+  .iconbtn.dark{color:var(--on-surface);}
+  .mag{width:14px;height:14px;border:2px solid var(--on-surface);border-radius:50%;position:relative;display:block;}
+  .mag::after{content:"";position:absolute;right:-5px;bottom:-4px;width:7px;height:2px;background:var(--on-surface);transform:rotate(45deg);}
+
+  .body{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+
+  .chips{display:flex;gap:8px;padding:0 16px 10px;overflow:hidden;}
+  .chip{
+    height:32px;padding:0 14px;border:1px solid var(--outline);border-radius:9px;
+    display:flex;align-items:center;font-size:13px;color:var(--on-surface-variant);white-space:nowrap;
+  }
+  .chip.on{background:var(--primary-container);border-color:var(--primary-container);color:var(--on-surface);font-weight:500;}
+
+  /* 时间流 */
+  .stream{flex:1;overflow:hidden;padding:0 12px;}
+  .daysep{text-align:center;font-size:11px;color:var(--on-surface-variant);padding:12px 0 10px;}
+  .ex{border:1px solid var(--outline-variant);border-radius:16px;padding:11px 12px;background:var(--surface);}
+  .ex + .ex{margin-top:8px;}
+  .ex .txt{font-size:14px;line-height:22px;}
+  .ex .meta{font-size:11px;color:var(--on-surface-variant);margin-top:9px;display:flex;gap:8px;}
+  .ex .meta .sp{flex:1;}
+  .cmts{margin-top:9px;padding-left:10px;border-left:2px solid var(--surface-container-high);}
+  .cmt{font-size:12px;line-height:19px;color:var(--on-surface-variant);}
+  .cmt + .cmt{margin-top:4px;}
+  .morecomments{font-size:11px;color:var(--on-surface-variant);margin-top:5px;}
+
+  /* 详情页引用块 */
+  .quote{
+    border-left:3px solid var(--outline);background:var(--surface-dim);
+    border-radius:0 12px 12px 0;padding:10px 12px;font-size:14px;line-height:22px;
+  }
+  .qsrc{font-size:11px;color:var(--on-surface-variant);margin-top:8px;}
+  .sectionhead{font-size:12px;font-weight:600;color:var(--on-surface-variant);padding:18px 0 8px;letter-spacing:.4px;}
+  .cmtline{display:flex;gap:10px;padding:9px 0;}
+  .cmtline .ln{width:2px;background:var(--surface-container-high);border-radius:1px;flex:0 0 2px;}
+  .cmtline .ct{flex:1;font-size:13px;line-height:21px;}
+  .cmtline .ct .tm{font-size:11px;color:var(--on-surface-variant);margin-top:3px;}
+
+  /* 写摘录 */
+  .field{padding:0 16px;}
+  .flabel{font-size:11px;color:var(--on-surface-variant);padding:14px 0 5px;}
+  .fbox{border:1px solid var(--outline-variant);border-radius:12px;padding:11px 12px;font-size:14px;line-height:22px;}
+  .fbox.tall{min-height:190px;}
+  .fbox.pick{display:flex;align-items:center;gap:8px;color:var(--on-surface);}
+  .fbox.pick .chev{color:var(--outline);}
+  .autotime{font-size:11px;color:var(--on-surface-variant);padding:14px 16px 0;}
+
+  /* 底部栏 */
+  .bottomnav{
+    height:62px;flex:0 0 62px;display:flex;border-top:1px solid var(--outline-variant);background:var(--surface);
+  }
+  .navitem{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--on-surface-variant);}
+  .navitem .pill{width:56px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:12px;}
+  .navitem.on{color:var(--on-surface);font-weight:600;}
+  .navitem.on .pill{background:var(--primary-container);}
+
+  .fab{
+    position:absolute;right:18px;bottom:78px;width:58px;height:58px;border-radius:18px;
+    background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;font-size:24px;
+  }
+
+
+  .legend{
+    margin-top:30px;padding:16px 18px;border:1px solid var(--outline-variant);border-radius:14px;
+    background:var(--surface);font-size:13px;line-height:22px;color:var(--on-surface-variant);max-width:1560px;
+  }
+  .legend b{color:var(--on-surface);}
+</style>
+</head>
+<body>
+  <h1>备忘录 App · 摘录部分线稿</h1>
+  <p class="sub">灰度线稿，只定布局与层级。原 9 屏（备忘录部分）不动，这 4 屏是新增。底部栏 ⑩⑪⑬ 都画了；⑫ 是模态录入页，按惯例不带底部栏。</p>
+
+  <div class="grid">
+
+    <!-- ⑩ 摘录流 -->
+    <div class="cell">
+      <div class="cap">⑩ 摘录流 <span>（时间流，按天分节）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><h2>摘录</h2><div class="iconbtn dark"><span class="mag"></span></div><div class="iconbtn">⋮</div></div>
+        <div class="chips">
+          <div class="chip on">全部</div><div class="chip">人类简史</div><div class="chip">置身事内</div><div class="chip">可能性的艺术</div>
+        </div>
+        <div class="body">
+          <div class="stream">
+            <div class="daysep">9月28日 周日</div>
+
+            <div class="ex">
+              <div class="txt">我们以为自己在选择，其实是在被选择之后，才回头替这个选择编一个理由。</div>
+              <div class="meta"><span>《人类简史》</span><span class="sp"></span><span>14:32</span></div>
+              <div class="cmts">
+                <div class="cmt">这句和昨天看的那个决策视频是一个意思。</div>
+                <div class="cmt">这个可以拿到下次复盘用。</div>
+              </div>
+            </div>
+
+            <div class="ex">
+              <div class="txt">所谓理性，很多时候只是把情绪讲得更有条理而已。</div>
+              <div class="meta"><span>《人类简史》</span><span class="sp"></span><span>10:20</span></div>
+              <div class="cmts">
+                <div class="cmt">存疑，作者这里的"情绪"定义太宽了。</div>
+              </div>
+              <div class="morecomments">还有 2 条 ›</div>
+            </div>
+
+            <div class="daysep">9月27日 周六</div>
+            <div class="ex">
+              <div class="txt">地图不是领土。任何模型都在丢掉细节换取可用性。</div>
+              <div class="meta"><span>《可能性的艺术》</span><span class="sp"></span><span>22:14</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="fab">+</div>
+        <div class="bottomnav">
+          <div class="navitem"><div class="pill">卡片</div>备忘录</div>
+          <div class="navitem on"><div class="pill">流</div>摘录</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑪ 摘录详情 -->
+    <div class="cell">
+      <div class="cap">⑪ 单条摘录详情 <span>（原文 + 我的评论）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><div class="iconbtn">←</div><h2>摘录</h2><div class="iconbtn dark">⋮</div></div>
+        <div class="body" style="padding:0 16px;">
+          <div class="quote">我们以为自己在选择，其实是在被选择之后，才回头替这个选择编一个理由。</div>
+          <div class="qsrc">《人类简史》 · 9月28日 14:32 收录</div>
+
+          <div class="sectionhead">我的评论 · 2 条</div>
+          <div class="cmtline">
+            <div class="ln"></div>
+            <div class="ct">这句和昨天看的那个决策视频是一个意思。<div class="tm">9月28日 14:35</div></div>
+          </div>
+          <div class="cmtline">
+            <div class="ln"></div>
+            <div class="ct">记一下：下次开会被追问理由时，先想想是不是事后编的。<div class="tm">9月28日 15:02</div></div>
+          </div>
+
+          <div class="sectionhead">追加一条</div>
+          <div class="fbox" style="color:#9A9A9A;">写点什么…</div>
+          <div class="autotime">原文不能改；评论只能追加，删错了可以删掉重发</div>
+        </div>
+        <div class="bottomnav">
+          <div class="navitem"><div class="pill">卡片</div>备忘录</div>
+          <div class="navitem on"><div class="pill">流</div>摘录</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑫ 写摘录 -->
+    <div class="cell">
+      <div class="cap">⑫ 写摘录 <span>（录入页）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><div class="iconbtn dark">✕</div><h2 style="font-size:17px;">写摘录</h2><div class="iconbtn" style="flex:0 0 auto;width:auto;padding:0 14px;font-size:14px;color:var(--on-surface);font-weight:500;">保存</div></div>
+        <div class="body">
+          <div class="field">
+            <div class="flabel">原文（粘贴或手打）</div>
+            <div class="fbox tall">
+              制度不是一个外部框架，它是人们反复互动后沉淀下来的默认动作。<br><br>
+              所以改变制度，往往不是改文件，而是改大家的默认动作。
+            </div>
+
+            <div class="flabel">出处</div>
+            <div class="fbox pick"><span style="flex:1;">《置身事内》</span><span class="chev">›</span></div>
+            <div class="autotime" style="padding:6px 0 0;">点一下从摘过的书里挑，也可以直接手打书名</div>
+
+            <div class="flabel">我的评论（可不写）</div>
+            <div class="fbox" style="color:#9A9A9A;min-height:64px;">这块和原文分开存，之后还能接着追加</div>
+          </div>
+          <div class="autotime">收录时间自动记为「现在」，存了就不能改</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑬ 备忘录 tab（带底部栏） -->
+    <div class="cell">
+      <div class="cap">⑬ 备忘录 tab <span>（加了底部栏之后）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><h2>备忘录</h2><div class="iconbtn dark"><span class="mag"></span></div><div class="iconbtn">⋮</div></div>
+        <div class="chips">
+          <div class="chip on">全部</div><div class="chip">工作</div><div class="chip">灵感</div><div class="chip">待办</div><div class="chip">管理</div>
+        </div>
+        <div class="body" style="padding:0 12px;">
+          <div class="sectionhead" style="padding:6px 4px 6px;">置顶</div>
+          <div class="ex" style="background:var(--surface-dim);border-color:var(--surface-container-high);">
+            <div class="txt" style="font-weight:600;">银行卡号与开户行</div>
+            <div class="bar b90" style="height:7px;border-radius:4px;background:var(--surface-container-high);margin-top:7px;"></div>
+          </div>
+          <div class="sectionhead" style="padding:14px 4px 6px;">全部 · 12 条</div>
+          <div class="ex">
+            <div class="txt" style="font-weight:600;">会议纪要 9/28</div>
+            <div class="bar b90" style="height:7px;border-radius:4px;background:var(--surface-container-high);margin-top:7px;"></div>
+            <div class="bar b60" style="height:7px;border-radius:4px;background:var(--surface-container-high);margin-top:6px;"></div>
+            <div class="meta"><span>工作</span><span class="sp"></span><span>10:20</span></div>
+          </div>
+          <div class="ex">
+            <div class="txt" style="font-weight:600;">小区门禁密码</div>
+            <div class="bar b45" style="height:7px;border-radius:4px;background:var(--surface-container-high);margin-top:7px;"></div>
+            <div class="meta"><span></span><span class="sp"></span><span>9/26</span></div>
+          </div>
+        </div>
+        <div class="fab">+</div>
+        <div class="bottomnav">
+          <div class="navitem on"><div class="pill">卡片</div>备忘录</div>
+          <div class="navitem"><div class="pill">流</div>摘录</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="legend">
+    <b>这 4 屏请你确认：</b><br>
+    1. <b>底部栏两个 tab</b>：备忘录（卡片）/ 摘录（流）。两边的搜索是同一个，搜一次两边都出结果。<br>
+    2. <b>⑩ 时间怎么标</b>：按天分节（"9月28日 周日"这种居中灰字）+ 每条自己带时分。不是微信那种"只在间隔久时插一条时间"—— 你要"记录时间"，我认为每条都带上时分更有用。<br>
+    3. <b>评论在流里怎么露</b>：默认铺开前 2 条，多的收成"还有 N 条 ›"，点进 ⑪ 看全部。这样流不会被评论淹掉。<br>
+    4. <b>摘录的书名</b>：点一下从摘过的书里挑，也能直接手打；筛选用上面那排 chip（书多了可以改成下拉，现在先按 chips 画）。<br>
+    5. <b>⑫ 录入页</b>：原文、出处、评论分三块；时间自动记「现在」，存了不能改。<br>
+    6. <b>还有两件没画、需要你定的</b>：<b>(a)</b> 摘录要不要也能删、进回收站？<b>(b)</b> 摘录顶栏「⋮」里要不要放导出？<br>
+    <br>
+    <b>另外说明一处改造</b>：加了底部栏之后，原来那 9 屏（备忘录部分）的底部都多出这条栏，内容整体上移约 62px。⑬ 就是改造后的样子，其余 8 屏不再重画，但实际界面都会有。
+  </div>
+</body>
+</html>
