@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ExcerptDao {
 
-    @Query("SELECT * FROM excerpt WHERE deletedAt IS NULL ORDER BY createdAt DESC")
+    /** 摘录流从旧到新排（像聊天记录，新的在最下面），所以打开时界面要自动停在最底。 */
+    @Query("SELECT * FROM excerpt WHERE deletedAt IS NULL ORDER BY createdAt ASC")
     fun observeActive(): Flow<List<ExcerptEntity>>
 
     @Query(
         "SELECT * FROM excerpt WHERE deletedAt IS NULL AND source = :source " +
-            "ORDER BY createdAt DESC",
+            "ORDER BY createdAt ASC",
     )
     fun observeActiveInSource(source: String): Flow<List<ExcerptEntity>>
 
@@ -23,7 +24,7 @@ interface ExcerptDao {
     @Query(
         "SELECT * FROM excerpt WHERE deletedAt IS NULL " +
             "AND source IN (SELECT name FROM book WHERE groupId = :groupId) " +
-            "ORDER BY createdAt DESC",
+            "ORDER BY createdAt ASC",
     )
     fun observeActiveInGroup(groupId: Long): Flow<List<ExcerptEntity>>
 
@@ -56,7 +57,7 @@ interface ExcerptDao {
         "SELECT * FROM excerpt WHERE deletedAt IS NULL AND (" +
             "text LIKE :pattern ESCAPE '\\' OR source LIKE :pattern ESCAPE '\\' " +
             "OR id IN (SELECT excerptId FROM excerpt_comment WHERE text LIKE :pattern ESCAPE '\\')" +
-            ") ORDER BY createdAt DESC",
+            ") ORDER BY createdAt ASC",
     )
     fun observeMatching(pattern: String): Flow<List<ExcerptEntity>>
 

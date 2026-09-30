@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -48,6 +49,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -370,8 +372,19 @@ private fun Stream(
     onLongPress: (ExcerptEntity) -> Unit,
 ) {
     val byDay = items.groupBy { TimeText.dayKey(it.createdAt) }
+    val listState = rememberLazyListState()
+
+    // 摘录是从旧到新排（像聊天记录），所以进来要停在最底下那条。
+    // 用"最新一条的 id"当触发条件：首次加载、以及新加了一条时都会跳到最新的那条；
+    // 光靠 items.size 会在删除时也乱跳。
+    val newestId = items.lastOrNull()?.id
+    val totalItems = byDay.size + items.size
+    LaunchedEffect(newestId, totalItems) {
+        if (totalItems > 0) listState.scrollToItem(totalItems - 1)
+    }
 
     LazyColumn(
+        state = listState,
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
