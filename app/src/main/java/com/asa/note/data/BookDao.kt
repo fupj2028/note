@@ -2,6 +2,7 @@ package com.asa.note.data
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.asa.note.data.entity.BookEntity
@@ -51,7 +52,9 @@ interface BookDao {
     @Query("DELETE FROM book_group WHERE id = :id")
     suspend fun deleteGroup(id: Long)
 
-    @Insert
+    // 书名是主键，改归属就是拿同一本书再写一次，必须 REPLACE；
+    // 默认的 ABORT 会在第二次赋值时撞主键，直接抛 SQLiteConstraintException 把应用干掉。
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertBook(book: BookEntity)
 
     @Transaction

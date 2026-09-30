@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -18,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,6 +36,7 @@ import com.asa.note.AppContainer
 import com.asa.note.data.BookGroupRow
 import com.asa.note.data.BookRow
 import com.asa.note.repo.NameResult
+import com.asa.note.ui.component.ChoiceRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,31 +65,11 @@ fun BookManageScreen(container: AppContainer, onBack: () -> Unit) {
                 .padding(horizontal = 16.dp),
         ) {
             Text(
-                text = "书是自动出现的（摘录里填了书名就会有），你只需要给它们挑个大类。",
+                text = "书是自动出现的（摘录里填了书名就会有）。点一本书就能改它的大类。",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 6.dp, bottom = 4.dp),
+                modifier = Modifier.padding(top = 6.dp),
             )
-
-            if (groupRows.isEmpty() && bookRows.isEmpty()) {
-                Text(
-                    text = "还没有书。先在摘录里填上书名，这里就会出现。",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 20.dp),
-                )
-                return@Column
-            }
-
-            SectionHead("大类")
-            HorizontalDivider()
-            groupRows.forEach { row ->
-                GroupRowView(
-                    row = row,
-                    onRename = { vm.startRenameGroup(row) },
-                    onDelete = { vm.askDeleteGroup(row) },
-                )
-            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -100,16 +82,38 @@ fun BookManageScreen(container: AppContainer, onBack: () -> Unit) {
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
-
-            SectionHead("书")
             HorizontalDivider()
-            val groupNames = groupRows.associate { it.id to it.name }
-            bookRows.forEach { book ->
-                BookRowView(
-                    row = book,
-                    groupName = groupNames[book.groupId],
-                    onPick = { vm.startPickGroup(book) },
+
+            if (groupRows.isEmpty() && bookRows.isEmpty()) {
+                Text(
+                    text = "还没有书。先在摘录里填上书名，这里就会出现。",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 20.dp),
                 )
+                return@Column
+            }
+
+            // 大类 + 它底下的书合成一棵树，书缩进挂在各自大类下面，关系一眼能看出来。
+            val booksByGroup = bookRows.groupBy { it.groupId }
+            groupRows.forEach { group ->
+                GroupRowView(
+                    row = group,
+                    onRename = { vm.startRenameGroup(group) },
+                    onDelete = { vm.askDeleteGroup(group) },
+                )
+                booksByGroup[group.id].orEmpty().forEach { book ->
+                    BookRowView(row = book, onPick = { vm.startPickGroup(book) })
+                }
+            }
+
+            // 未归类不是一个真大类（不能改名也不能删），所以放最后单列一段。
+            val orphans = booksByGroup[null].orEmpty()
+            if (orphans.isNotEmpty()) {
+                OrphanHead(count = orphans.size)
+                orphans.forEach { book ->
+                    BookRowView(row = book, onPick = { vm.startPickGroup(book) })
+                }
             }
             Box(Modifier.padding(bottom = 28.dp))
         }
@@ -210,20 +214,34 @@ fun BookManageScreen(container: AppContainer, onBack: () -> Unit) {
     }
 }
 
+/** 「未归类」的表头：它不是一个真的大类，所以没有改名/删除。 */
 @Composable
-private fun SectionHead(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
-    )
+private fun OrphanHead(count: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = "未归类",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = "$count 本书 · 点一下挑个大类",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+    }
+    HorizontalDivider()
 }
 
 @Composable
 private fun GroupRowView(row: BookGroupRow, onRename: () -> Unit, onDelete: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
@@ -251,47 +269,34 @@ private fun GroupRowView(row: BookGroupRow, onRename: () -> Unit, onDelete: () -
     HorizontalDivider()
 }
 
+/** 书缩进挂在大类底下（缩进表示从属），右边只留一个箭头说明「点它能改大类」。 */
 @Composable
-private fun BookRowView(row: BookRow, groupName: String?, onPick: () -> Unit) {
+private fun BookRowView(row: BookRow, onPick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onPick)
-            .padding(vertical = 12.dp),
+            .padding(start = 22.dp, end = 4.dp, top = 11.dp, bottom = 11.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(Modifier.weight(1f)) {
-            Text(row.name, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(
-                text = "${row.excerptCount} 条摘录",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 2.dp),
-            )
-        }
         Text(
-            text = if (groupName == null) "未归类 ›" else "$groupName ›",
-            style = MaterialTheme.typography.labelMedium,
-            color = if (groupName == null) {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            } else {
-                MaterialTheme.colorScheme.primary
-            },
+            text = row.name,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = "${row.excerptCount} 条摘录",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = "改大类",
+            modifier = Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-    HorizontalDivider()
-}
-
-@Composable
-private fun ChoiceRow(label: String, selected: Boolean, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        RadioButton(selected = selected, onClick = onClick)
-        Text(label, style = MaterialTheme.typography.bodyLarge)
-    }
+    HorizontalDivider(Modifier.padding(start = 22.dp))
 }
