@@ -19,6 +19,14 @@ interface ExcerptDao {
     )
     fun observeActiveInSource(source: String): Flow<List<ExcerptEntity>>
 
+    /** 按大类筛：书归哪个大类记在 book 表里。 */
+    @Query(
+        "SELECT * FROM excerpt WHERE deletedAt IS NULL " +
+            "AND source IN (SELECT name FROM book WHERE groupId = :groupId) " +
+            "ORDER BY createdAt DESC",
+    )
+    fun observeActiveInGroup(groupId: Long): Flow<List<ExcerptEntity>>
+
     @Query(
         "SELECT DISTINCT source FROM excerpt WHERE deletedAt IS NULL AND source != '' " +
             "ORDER BY source ASC",

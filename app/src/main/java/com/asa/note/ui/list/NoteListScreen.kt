@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -198,6 +200,9 @@ private fun SectionHeader(text: String) {
     )
 }
 
+/** 两种列表的卡片都用这个高度，固定住、超出截断；完整内容点进详情页看。 */
+private val CardHeight = 112.dp
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NoteCard(
@@ -215,12 +220,13 @@ private fun NoteCard(
         },
         modifier = Modifier
             .fillMaxWidth()
+            .height(CardHeight)
             .combinedClickable(
                 onClick = { onOpen(note) },
                 onLongClick = { onLongPress(note) },
             ),
     ) {
-        Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+        Column(Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 12.dp)) {
             Text(
                 text = note.title.ifBlank { "（无标题）" },
                 style = MaterialTheme.typography.titleMedium,
@@ -237,8 +243,9 @@ private fun NoteCard(
                     modifier = Modifier.padding(top = 4.dp),
                 )
             }
+            Spacer(Modifier.weight(1f))
             Row(
-                Modifier.fillMaxWidth().padding(top = 8.dp),
+                Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (categoryName != null) {

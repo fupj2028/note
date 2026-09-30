@@ -48,6 +48,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onOpenTrash: () -> Unit,
     onOpenCategories: () -> Unit,
+    onOpenBooks: () -> Unit,
 ) {
     val vm: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(container))
     val trashCount by vm.trashCount.collectAsStateWithLifecycle()
@@ -79,8 +80,9 @@ fun SettingsScreen(
             SettingRow("主题", settings.themeMode.label) { pickingTheme = true }
             SettingRow("色系", settings.palette.label) { pickingPalette = true }
 
-            GroupHeader("分类")
-            SettingRow("分类管理", "新建 / 重命名 / 隐藏", onClick = onOpenCategories)
+            GroupHeader("分类与书目")
+            SettingRow("分类管理", "备忘录的分类", onClick = onOpenCategories)
+            SettingRow("书目管理", "摘录的书与大类", onClick = onOpenBooks)
 
             GroupHeader("数据")
             SettingRow("导出全部", "Download/备忘录") {

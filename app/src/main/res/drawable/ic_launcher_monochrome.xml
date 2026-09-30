@@ -1,17 +1,16 @@
-<!-- Android 13+ 主题图标用的单色层。系统只取形状，颜色由系统上，所以这里用描边画出线稿形状。 -->
+<!-- Android 13+ 主题图标用的单色层：同一个图形，纯白，颜色由系统上。 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M42,28 L62,28 L74,40 L74,76 A4,4 0 0 1 70,80 L42,80 A4,4 0 0 1 38,76 L38,32 A4,4 0 0 1 42,28 Z"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="5" />
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M45,52 L67,52 M45,62 L67,62 M45,72 L60,72"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="5" />
+    <group
+        android:scaleX="0.07266"
+        android:scaleY="0.07266"
+        android:translateX="16.80"
+        android:translateY="13.70">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M896 896h-341.333333V256a128 128 0 0 1 128-128h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v682.666666a42.666667 42.666667 0 0 1 -42.666667 42.666667z m-426.666667 0H128a42.666667 42.666667 0 0 1 -42.666667 -42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667 -42.666667h213.333333a128 128 0 0 1 128 128v640z m0 0h85.333334v85.333333h-85.333334v-85.333333z" />
+    </group>
 </vector>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>备忘录 App · 书目分类线稿</title>
+<style>
+  :root{
+    --surface:#FFFFFF; --surface-dim:#F2F2F2; --surface-container:#EAEAEA;
+    --surface-container-high:#E0E0E0; --on-surface:#1B1B1B; --on-surface-variant:#5D5D5D;
+    --outline:#C6C6C6; --outline-variant:#DEDEDE; --primary:#3F3F3F; --on-primary:#FFFFFF;
+    --primary-container:#D6D6D6; --page:#F7F7F7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+       background:var(--page);color:var(--on-surface);padding:28px 24px 40px;}
+  h1{font-size:20px;font-weight:600;margin-bottom:6px;}
+  .sub{font-size:13px;color:var(--on-surface-variant);margin-bottom:22px;}
+  .grid{display:grid;grid-template-columns:repeat(4,360px);gap:34px 30px;}
+  .cell{display:flex;flex-direction:column;gap:8px;}
+  .cap{font-size:13px;font-weight:600;}
+  .cap span{font-weight:400;color:var(--on-surface-variant);}
+  .phone{width:360px;height:760px;background:var(--surface);border:1px solid var(--outline);
+         border-radius:26px;overflow:hidden;display:flex;flex-direction:column;position:relative;}
+  .statusbar{height:26px;flex:0 0 26px;display:flex;align-items:center;justify-content:space-between;
+             padding:0 14px;font-size:10px;color:var(--on-surface-variant);}
+  .statusbar .right{display:flex;gap:4px;}
+  .statusbar .right i{display:block;width:12px;height:8px;background:var(--outline);border-radius:2px;}
+  .appbar{height:56px;flex:0 0 56px;display:flex;align-items:center;gap:4px;padding:0 8px 0 16px;}
+  .appbar h2{font-size:20px;font-weight:500;flex:1;}
+  .iconbtn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+           font-size:14px;color:var(--on-surface-variant);flex:0 0 40px;}
+  .iconbtn.dark{color:var(--on-surface);}
+  .mag{width:14px;height:14px;border:2px solid var(--on-surface);border-radius:50%;position:relative;display:block;}
+  .mag::after{content:"";position:absolute;right:-5px;bottom:-4px;width:7px;height:2px;background:var(--on-surface);transform:rotate(45deg);}
+  .book{width:15px;height:14px;border:2px solid var(--on-surface);border-radius:2px;position:relative;display:block;}
+  .book::after{content:"";position:absolute;left:3px;top:-2px;bottom:-2px;width:2px;background:var(--on-surface);}
+  .body{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+  .chiprow{display:flex;gap:8px;padding:0 16px 8px;overflow:hidden;}
+  .chip{height:32px;padding:0 14px;border:1px solid var(--outline);border-radius:9px;
+        display:flex;align-items:center;font-size:13px;color:var(--on-surface-variant);white-space:nowrap;}
+  .chip.on{background:var(--primary-container);border-color:var(--primary-container);color:var(--on-surface);font-weight:500;}
+  .chip.book{font-size:12px;height:28px;padding:0 11px;border-radius:8px;}
+
+  /* 时间流 + 固定高度卡片 */
+  .stream{flex:1;overflow:hidden;padding:0 12px;}
+  .daysep{text-align:center;font-size:11px;color:var(--on-surface-variant);padding:10px 0 8px;}
+  .ex{height:104px;border:1px solid var(--outline-variant);border-radius:14px;padding:11px 12px;
+      background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+  .ex + .ex{margin-top:8px;}
+  .ex .txt{font-size:14px;line-height:21px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+  .ex .meta{margin-top:auto;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--on-surface-variant);}
+  .ex .meta .cmt{background:var(--surface-container);border-radius:6px;padding:1px 6px;}
+  .ex .meta .sp{flex:1;}
+
+  /* 备忘录卡片同高 */
+  .nt{height:104px;border:1px solid var(--outline-variant);border-radius:14px;padding:11px 12px;
+      background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+  .nt + .nt{margin-top:8px;}
+  .nt .title{font-size:15px;font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+  .nt .txt{margin-top:4px;font-size:13px;line-height:20px;color:var(--on-surface-variant);
+           overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .nt .meta{margin-top:auto;display:flex;align-items:center;font-size:11px;color:var(--on-surface-variant);}
+  .nt .meta .sp{flex:1;}
+
+  /* 列表行（管理页） */
+  .row{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--outline-variant);}
+  .row .lb{flex:1;font-size:14px;}
+  .row .sub2{font-size:11px;color:var(--on-surface-variant);margin-top:3px;}
+  .row .act{font-size:12px;color:var(--primary);padding:6px 6px;}
+  .row .act.danger{color:var(--on-surface-variant);}
+  .sechead{font-size:12px;font-weight:600;color:var(--on-surface-variant);padding:12px 4px 2px;}
+  .hint{font-size:12.5px;line-height:20px;color:var(--on-surface-variant);padding:6px 4px;}
+
+  /* 对话框 */
+  .scrim{position:absolute;inset:0;background:rgba(0,0,0,0.32);}
+  .dlg{position:absolute;left:24px;right:24px;top:180px;background:var(--surface);border-radius:20px;
+       padding:20px 20px 12px;border:1px solid var(--outline-variant);}
+  .dlg h3{font-size:16px;font-weight:600;margin-bottom:2px;}
+  .dlg .who{font-size:12px;color:var(--on-surface-variant);margin-bottom:12px;}
+  .opt{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:14px;}
+  .radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--outline);flex:0 0 16px;}
+  .radio.on{border-color:var(--primary);background:radial-gradient(circle,var(--primary) 0 4px,transparent 4.5px);}
+  .opt .plus{color:var(--primary);font-weight:600;}
+  .dlgbtns{display:flex;justify-content:flex-end;gap:8px;padding-top:8px;}
+  .dlgbtns span{font-size:13px;padding:8px 10px;}
+
+  .legend{margin-top:30px;padding:16px 18px;border:1px solid var(--outline-variant);border-radius:14px;
+          background:var(--surface);font-size:13px;line-height:22px;color:var(--on-surface-variant);max-width:1560px;}
+  .legend b{color:var(--on-surface);}
+</style>
+</head>
+<body>
+  <h1>备忘录 App · 书目分类 + 固定高度卡片 线稿</h1>
+  <p class="sub">灰度线稿，只定布局与层级。4 屏。卡片统一按"紧凑型"画：高度固定 104px，两种卡片同高。</p>
+
+  <div class="grid">
+
+    <!-- ⑭ 摘录：未选大类 -->
+    <div class="cell">
+      <div class="cap">⑭ 摘录 · 未选大类 <span>（只有大类行）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><h2>摘录</h2><div class="iconbtn dark"><span class="book"></span></div><div class="iconbtn dark"><span class="mag"></span></div></div>
+        <div class="chiprow">
+          <div class="chip on">全部</div><div class="chip">文学</div><div class="chip">历史</div><div class="chip">未归类</div>
+        </div>
+        <div class="body">
+          <div class="stream">
+            <div class="daysep">9月29日 星期二</div>
+            <div class="ex">
+              <div class="txt">这是最好的时代，这是最坏的时代；这是智慧的年代，这是愚蠢的年代；这是信仰的时期，这是怀疑的时期。</div>
+              <div class="meta"><span>双城记</span><span class="cmt">3 条评论</span><span class="sp"></span><span>20:51</span></div>
+            </div>
+            <div class="ex">
+              <div class="txt">111</div>
+              <div class="meta"><span>耳朵</span><span class="sp"></span><span>20:33</span></div>
+            </div>
+            <div class="ex">
+              <div class="txt">所谓理性，很多时候只是把情绪讲得更有条理而已。这句话我存疑，作者这里的定义太宽了。</div>
+              <div class="meta"><span>人类简史</span><span class="cmt">1 条评论</span><span class="sp"></span><span>10:20</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;right:18px;bottom:18px;width:58px;height:58px;border-radius:18px;
+                    background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;font-size:24px;">＋</div>
+      </div>
+    </div>
+
+    <!-- ⑮ 摘录：选中大类后展开书名行 -->
+    <div class="cell">
+      <div class="cap">⑮ 摘录 · 选中「文学」 <span>（书名行才出现）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><h2>摘录</h2><div class="iconbtn dark"><span class="book"></span></div><div class="iconbtn dark"><span class="mag"></span></div></div>
+        <div class="chiprow">
+          <div class="chip">全部</div><div class="chip on">文学</div><div class="chip">历史</div><div class="chip">未归类</div>
+        </div>
+        <div class="chiprow">
+          <div class="chip book on">全部</div><div class="chip book">双城记</div><div class="chip book">局外人</div><div class="chip book">百年孤独</div>
+        </div>
+        <div class="body">
+          <div class="stream">
+            <div class="daysep">9月29日 星期二</div>
+            <div class="ex">
+              <div class="txt">这是最好的时代，这是最坏的时代；这是智慧的年代，这是愚蠢的年代；这是信仰的时期，这是怀疑的时期。</div>
+              <div class="meta"><span>双城记</span><span class="cmt">3 条评论</span><span class="sp"></span><span>20:51</span></div>
+            </div>
+            <div class="ex">
+              <div class="txt">今天，妈妈死了。也许是昨天，我不知道。</div>
+              <div class="meta"><span>局外人</span><span class="sp"></span><span>昨天</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;right:18px;bottom:18px;width:58px;height:58px;border-radius:18px;
+                    background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;font-size:24px;">＋</div>
+      </div>
+    </div>
+
+    <!-- ⑯ 书目管理 -->
+    <div class="cell">
+      <div class="cap">⑯ 书目管理 <span>（大类 + 书，一页）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><div class="iconbtn">←</div><h2>书目管理</h2></div>
+        <div class="body" style="padding:0 16px;">
+          <div class="hint">书是自动出现的（摘录里填了书名就会有），你只需要给它们挑个大类。</div>
+
+          <div class="sechead">大类</div>
+          <div class="row" style="border-top:1px solid var(--outline-variant);">
+            <div class="lb">文学<div class="sub2">3 本书 · 8 条摘录</div></div>
+            <span class="act">重命名</span><span class="act danger">删除</span>
+          </div>
+          <div class="row">
+            <div class="lb">历史<div class="sub2">2 本书 · 6 条摘录</div></div>
+            <span class="act">重命名</span><span class="act danger">删除</span>
+          </div>
+          <div class="row">
+            <div class="lb plus" style="color:var(--primary);font-weight:500;">＋ 新建大类</div>
+          </div>
+
+          <div class="sechead">书</div>
+          <div class="row">
+            <div class="lb">双城记<div class="sub2">3 条摘录</div></div>
+            <span class="act">文学 ›</span>
+          </div>
+          <div class="row">
+            <div class="lb">百年孤独<div class="sub2">4 条摘录</div></div>
+            <span class="act">文学 ›</span>
+          </div>
+          <div class="row">
+            <div class="lb">人类简史<div class="sub2">5 条摘录</div></div>
+            <span class="act">历史 ›</span>
+          </div>
+          <div class="row">
+            <div class="lb">耳朵<div class="sub2">1 条摘录</div></div>
+            <span class="act" style="color:var(--on-surface-variant);">未归类 ›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑰ 挑大类对话框 -->
+    <div class="cell">
+      <div class="cap">⑰ 「挑大类」对话框 <span>（点某一本书）</span></div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span class="right"><i></i><i></i><i></i></span></div>
+        <div class="appbar"><div class="iconbtn">←</div><h2>书目管理</h2></div>
+        <div class="body" style="padding:0 16px;">
+          <div class="sechead">大类</div>
+          <div class="row" style="border-top:1px solid var(--outline-variant);">
+            <div class="lb">文学<div class="sub2">3 本书 · 8 条摘录</div></div>
+          </div>
+        </div>
+        <div class="scrim"></div>
+        <div class="dlg">
+          <h3>把「耳朵」归到哪个大类</h3>
+          <div class="who">大类只影响摘录页怎么筛，不影响摘录本身</div>
+          <div class="opt"><span class="radio on"></span>未归类</div>
+          <div class="opt"><span class="radio"></span>文学</div>
+          <div class="opt"><span class="radio"></span>历史</div>
+          <div class="opt"><span class="radio"></span><span class="plus">＋</span>新建大类…</div>
+          <div class="dlgbtns"><span>取消</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="legend">
+    <b>这 4 屏请你确认：</b><br>
+    1. <b>两层筛选怎么出现</b>（⑭ ⑮）：未选大类时只有一行大类 chips；<b>选中某个大类后，下面才展开一行书名</b>。这样书再多也不会挤，也省掉一行常驻高度。选「未归类」同样会展开那一批书名。<br>
+    2. <b>书目管理页做成一页两段</b>（⑯）：上半是「大类」（可重命名 / 删除 / 新建），下半是「书」（点一本书右侧的大类名去改）。<b>书是自动出现的</b>，你只需要挑大类 —— 不需要手动录书。<br>
+    3. <b>大类不做成第二个「分类管理」页</b>：它存在的唯一目的就是给书分组，跟书放一页才看得见关系。备忘录那边的「分类」完全不动，两边不共用。<br>
+    4. <b>入口</b>：摘录页顶栏加一个书本图标（⑭ ⑮ 顶栏右边那个）进书目管理。不用「管理」chip —— 你上次说过 chip 会和分类混在一起。<br>
+    5. <b>卡片固定高度</b>（⑭ ⑮ ⑯ 里两种卡片都按 104px 画，同高）：摘录卡片原文最多 3 行、备忘录卡片标题 1 行 + 正文 2 行，超出截断，点进详情页看完整。<br>
+    6. <b>评论改成「N 条评论」标记</b>（⑭ 里那个小灰底标签），没有评论就不出现。评论全文在详情页。<br>
+    <br>
+    <b>另外提醒一句</b>：这次要动数据库表结构（新增「书」和「大类」），你手机上已经有真实数据了，所以我会写一个迁移脚本把现有数据原样带过去 —— 不会再让你卸载重装。
+  </div>
+</body>
+</html>

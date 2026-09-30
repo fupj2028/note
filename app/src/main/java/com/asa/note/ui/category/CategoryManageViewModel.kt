@@ -10,7 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.asa.note.AppContainer
 import com.asa.note.data.entity.CategoryEntity
 import com.asa.note.repo.CategoryRepository
-import com.asa.note.repo.CategoryResult
+import com.asa.note.repo.NameResult
 import com.asa.note.repo.NoteRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 data class CategoryRow(val category: CategoryEntity, val noteCount: Int)
 
 /** [id] 为空表示新建，否则是重命名。 */
-data class NameDialog(val id: Long?, val text: String, val error: CategoryResult?)
+data class NameDialog(val id: Long?, val text: String, val error: NameResult?)
 
 class CategoryManageViewModel(
     private val categories: CategoryRepository,
@@ -67,7 +67,7 @@ class CategoryManageViewModel(
             } else {
                 categories.rename(dialog.id, dialog.text)
             }
-            nameDialog = if (result == CategoryResult.Ok) null else dialog.copy(error = result)
+            nameDialog = if (result == NameResult.Ok) null else dialog.copy(error = result)
         }
     }
 

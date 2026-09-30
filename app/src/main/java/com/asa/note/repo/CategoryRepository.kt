@@ -4,12 +4,6 @@ import com.asa.note.data.CategoryDao
 import com.asa.note.data.entity.CategoryEntity
 import kotlinx.coroutines.flow.Flow
 
-sealed interface CategoryResult {
-    data object Ok : CategoryResult
-    data object BlankName : CategoryResult
-    data object DuplicateName : CategoryResult
-}
-
 class CategoryRepository(private val dao: CategoryDao) {
 
     fun observeAll(): Flow<List<CategoryEntity>> = dao.observeAll()
@@ -19,20 +13,20 @@ class CategoryRepository(private val dao: CategoryDao) {
     /** 导出用的一次性读取，含隐藏的分类。 */
     suspend fun listAll(): List<CategoryEntity> = dao.listAll()
 
-    suspend fun create(rawName: String): CategoryResult {
+    suspend fun create(rawName: String): NameResult {
         val name = rawName.trim()
-        if (name.isEmpty()) return CategoryResult.BlankName
-        if (dao.countByName(name, exceptId = -1L) > 0) return CategoryResult.DuplicateName
+        if (name.isEmpty()) return NameResult.BlankName
+        if (dao.countByName(name, exceptId = -1L) > 0) return NameResult.DuplicateName
         dao.insert(CategoryEntity(name = name, createdAt = System.currentTimeMillis()))
-        return CategoryResult.Ok
+        return NameResult.Ok
     }
 
-    suspend fun rename(id: Long, rawName: String): CategoryResult {
+    suspend fun rename(id: Long, rawName: String): NameResult {
         val name = rawName.trim()
-        if (name.isEmpty()) return CategoryResult.BlankName
-        if (dao.countByName(name, exceptId = id) > 0) return CategoryResult.DuplicateName
+        if (name.isEmpty()) return NameResult.BlankName
+        if (dao.countByName(name, exceptId = id) > 0) return NameResult.DuplicateName
         dao.rename(id, name)
-        return CategoryResult.Ok
+        return NameResult.Ok
     }
 
     suspend fun setHidden(id: Long, hidden: Boolean) = dao.setHidden(id, hidden)

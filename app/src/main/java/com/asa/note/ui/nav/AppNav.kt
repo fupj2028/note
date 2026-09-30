@@ -46,6 +46,7 @@ import androidx.navigation.navArgument
 import android.net.Uri
 import com.asa.note.AppContainer
 import com.asa.note.repo.AppSettings
+import com.asa.note.ui.book.BookManageScreen
 import com.asa.note.ui.category.CategoryManageScreen
 import com.asa.note.ui.editor.NoteEditorScreen
 import com.asa.note.ui.excerpt.ExcerptComposerScreen
@@ -65,6 +66,7 @@ private object Routes {
     const val SEARCH = "search"
     const val TRASH = "trash"
     const val CATEGORIES = "categories"
+    const val BOOKS = "books"
 }
 
 /** 底栏内容净高。系统手势区留白另外由 windowInsetsPadding 加，不混在这个数里。 */
@@ -86,6 +88,7 @@ fun AppNav(container: AppContainer, settings: AppSettings) {
                 },
                 onOpenSearch = { nav.navigate(Routes.SEARCH) },
                 onOpenCategories = { nav.navigate(Routes.CATEGORIES) },
+                onOpenBookManage = { nav.navigate(Routes.BOOKS) },
             )
         }
 
@@ -149,11 +152,19 @@ fun AppNav(container: AppContainer, settings: AppSettings) {
                 onBack = { nav.popBackStack() },
                 onOpenTrash = { nav.navigate(Routes.TRASH) },
                 onOpenCategories = { nav.navigate(Routes.CATEGORIES) },
+                onOpenBooks = { nav.navigate(Routes.BOOKS) },
             )
         }
 
         composable(Routes.CATEGORIES) {
             CategoryManageScreen(
+                container = container,
+                onBack = { nav.popBackStack() },
+            )
+        }
+
+        composable(Routes.BOOKS) {
+            BookManageScreen(
                 container = container,
                 onBack = { nav.popBackStack() },
             )
@@ -177,6 +188,7 @@ private fun HomeScreen(
     onOpenExcerptComposer: (String?) -> Unit,
     onOpenSearch: () -> Unit,
     onOpenCategories: () -> Unit,
+    onOpenBookManage: () -> Unit,
 ) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
 
@@ -202,6 +214,7 @@ private fun HomeScreen(
                     onOpenDetail = onOpenExcerptDetail,
                     onOpenComposer = onOpenExcerptComposer,
                     onOpenSearch = onOpenSearch,
+                    onOpenBookManage = onOpenBookManage,
                 )
             }
         }

@@ -13,6 +13,9 @@ class ExcerptRepository(private val dao: ExcerptDao) {
     fun observeActiveInSource(source: String): Flow<List<ExcerptEntity>> =
         dao.observeActiveInSource(source)
 
+    fun observeActiveInGroup(groupId: Long): Flow<List<ExcerptEntity>> =
+        dao.observeActiveInGroup(groupId)
+
     fun observeSources(): Flow<List<String>> = dao.observeSources()
 
     fun observeTrash(): Flow<List<ExcerptEntity>> = dao.observeTrash()

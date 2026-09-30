@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asa.note.AppContainer
-import com.asa.note.repo.CategoryResult
+import com.asa.note.repo.NameResult
 import com.asa.note.ui.component.EmptyView
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -196,9 +196,9 @@ private fun NameDialogView(
                 dialog.error?.let { error ->
                     Text(
                         text = when (error) {
-                            CategoryResult.BlankName -> "名字不能空着"
-                            CategoryResult.DuplicateName -> "已经有同名的分类了"
-                            CategoryResult.Ok -> ""
+                            NameResult.BlankName -> "名字不能空着"
+                            NameResult.DuplicateName -> "已经有同名的分类了"
+                            NameResult.Ok -> ""
                         },
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.error,
